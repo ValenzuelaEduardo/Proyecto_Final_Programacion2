@@ -1,5 +1,4 @@
 import pygame
-import random
 import sys
 from pygame.locals import QUIT
 
@@ -7,86 +6,40 @@ BROWN = (199, 66, 37)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+CELESTE = (173, 216, 230)
 
-class Organismo(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = pygame.Surface((20, 20))
-        self.image.fill(WHITE)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.vida = 100
-        self.energia = 50
-        self.velocidad = 2
+CELL_SIZE = 20
+MAP_WIDTH = 40
+MAP_HEIGHT = 30
 
-    def mover(self):
-        self.rect.x += random.randint(-self.velocidad, self.velocidad)
-        self.rect.y += random.randint(-self.velocidad, self.velocidad)
+def create_empty_map():
+    return [[None for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)]
 
-    def reproducir(self):
-        pass
+def spawn_organism(mapa, x, y, tipo, color):
+    mapa[y][x] = (tipo, color)
 
-    def morir(self):
-        pass
-
-class Animal(Organismo):
-    def __init__(self, x, y):
-        super().__init__(x, y)
-        self.image.fill(RED)
-        self.especie = "Especie"
-        self.dieta = "Herbivoro"
-        self.direccion = 1
-
-    def cazar(self):
-        pass
-
-    def mover_derecha(self):
-        self.rect.x += self.velocidad
-
-    def mover_izquierda(self):
-        self.rect.x -= self.velocidad
-
-class Planta(Organismo):
-    def __init__(self, x, y):
-        super().__init__(x, y)
-        self.image.fill(GREEN)
-
-    def fotosintesis(self):
-        pass
-
-    def reproducir_por_semillas(self):
-        pass
-
-class Ambiente(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.image.fill(BROWN)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-
-    def afectar_ecosistema(self):
-        pass
+def spawn_animal(mapa, x, y, especie):
+    color = RED  # Puedes ajustar el color según la especie si es necesario
+    spawn_organism(mapa, x, y, "animal", color)
 
 def main():
     pygame.init()
 
-    width, height = 800, 600
+    width, height = CELL_SIZE * MAP_WIDTH, CELL_SIZE * MAP_HEIGHT
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption("Simulador de Ecosistemas")
 
     clock = pygame.time.Clock()
 
-    all_sprites = pygame.sprite.Group()
+    tiempo_inicial = pygame.time.get_ticks()
 
-    organismo = Organismo(100, 100)
-    animal = Animal(200, 200)
-    planta = Planta(300, 300)
-    ambiente = Ambiente(400, 400)
+    mapa = create_empty_map()
 
-    all_sprites.add(organismo, animal, planta, ambiente)
+    # Agregar algunos animales al mapa
+    spawn_animal(mapa, 5, 5, "león")
+    spawn_animal(mapa, 10, 10, "cebra")
+    spawn_animal(mapa, 20, 15, "león")
+    spawn_animal(mapa, 30, 25, "cebra")
 
     while True:
         for event in pygame.event.get():
@@ -94,20 +47,19 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-        all_sprites.update()
+        tiempo_transcurrido = pygame.time.get_ticks() - tiempo_inicial
 
-        for sprite in all_sprites:
-            if isinstance(sprite, Animal):
-                if sprite.rect.x > 600 or sprite.rect.x < 100:
-                    sprite.direccion *= -1
+        # Cambiar a color celeste cada 30 segundos (30000 milisegundos)
+        if tiempo_transcurrido % 30000 < 15000:
+            screen.fill(CELESTE)
+        else:
+            screen.fill(BROWN)
 
-                if sprite.direccion == 1:
-                    sprite.mover_derecha()
-                else:
-                    sprite.mover_izquierda()
-
-        screen.fill(BROWN)
-        all_sprites.draw(screen)
+        # Dibujar el mapa
+        for y, row in enumerate(mapa):
+            for x, organismo in enumerate(row):
+                if organismo:
+                    pygame.draw.rect(screen, organismo[1], (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
         pygame.display.flip()
         clock.tick(60)
