@@ -1,4 +1,6 @@
-# Clase Organismo
+import pygame
+import random
+
 class Organismo(pygame.sprite.Sprite):
     def __init__(self, columna, fila, ancho, alto, color):
         super().__init__()
@@ -13,7 +15,6 @@ class Organismo(pygame.sprite.Sprite):
     def update(self):
         pass
 
-# Subclase Planta
 class Planta(Organismo):
     def __init__(self, columna, fila, ancho, alto, color):
         super().__init__(columna, fila, ancho, alto, color)
@@ -21,18 +22,17 @@ class Planta(Organismo):
     def update(self):
         pass
 
-# Subclase Animal
 class Animal(Organismo):
     def __init__(self, columna, fila, ancho, alto, color, especie, dieta):
         super().__init__(columna, fila, ancho, alto, color)
         self.especie = especie
         self.dieta = dieta
         self.contador_movimiento = 0
-        self.tiempo_para_moverse = 60  # Ajusta este valor para cambiar la velocidad
+        self.tiempo_para_moverse = 60
 
     def mover(self):
         if self.contador_movimiento >= self.tiempo_para_moverse:
-            direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # izquierda, derecha, arriba, abajo
+            direcciones = [(-1, 0), (1, 0), (0, -1), (0, 1)]
             dx, dy = random.choice(direcciones)
             nueva_columna = self.columna + dx
             nueva_fila = self.fila + dy
@@ -41,7 +41,12 @@ class Animal(Organismo):
                 self.fila = nueva_fila
                 self.rect.topleft = (self.columna * tamaño_celda, self.fila * tamaño_celda)
             self.contador_movimiento = 0
+        else:
+            self.contador_movimiento += 1
 
     def update(self):
-        self.contador_movimiento += 1
         self.mover()
+
+todos_los_sprites = pygame.sprite.Group()
+animales = pygame.sprite.Group()
+plantas = pygame.sprite.Group()
