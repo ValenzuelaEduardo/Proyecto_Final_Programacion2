@@ -185,6 +185,7 @@ valores_cesped_arbustos = [0, 2]
 
 
 lista_animales = []
+
 for i in range(4):
     # Añadir animales en posiciones aleatorias donde haya pasto o arbustos
     lista_animales.append(Animal(
@@ -220,33 +221,25 @@ class Planta(Organismo):
         self.vida += 1  # La planta gana 1 de vida
         self.energia += 1  # También podría ganar energía si así lo deseas
 
-    def dibujar(self, pantalla):
+    def dibujar_pl(self, pantalla):
         if self.sprite:
             # Dibuja el sprite en la posición correspondiente
             pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
         else:
             # Si no hay sprite, podrías dibujar un rectángulo o círculo como placeholder
-            pygame.draw.rect(pantalla, (255, 0, 0), (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
+            pygame.draw.rect(pantalla, (20, 255, 0), (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
+
+    def reproducirse(self):
+        # Puedes agregar la lógica de reproducción aquí
+        pass
 
 posiciones_de_plantas = []
-# Ejemplo de cómo podrías actualizar la vida de las plantas en el juego
-# Suponiendo que tienes una lista de todas las plantas en el juego
+
 plantas = [Planta((x, y), vida=5, energia=10) for x, y in posiciones_de_plantas]
 
 # Después de cada ciclo en el juego, podrías llamar a la fotosíntesis para cada planta
 for planta in plantas:
     planta.fotosintesis()
-
-
-    def reproducirse(self):
-        if planta in boards:
-            # Dibuja el sprite en la posición correspondiente
-            pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
-        else:
-            # Si no hay sprite, podrías dibujar un rectángulo o círculo como placeholder
-            pygame.draw.rect(pantalla, (255, 0, 0), (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
-        pass
-
 class Ambiente:
     def __init__(self):
         self.factores = []  # Lista de factores abióticos
@@ -316,10 +309,6 @@ while corriendo:
                 # Agrega aquí la lógica que deseas ejecutar cuando se presiona la tecla ESPACIO
                 pass
 
-    # Resto del bucle principal (actualización de estado, dibujo, etc.)
-    for planta in plantas:
-        planta.fotosintesis()  # Actualizar la vida de las plantas
-
     # Medir el tiempo transcurrido
     tiempo_transcurrido += reloj.tick()
 
@@ -333,6 +322,11 @@ while corriendo:
     # Dibujar el ecosistema
     ecosistema.dibujar_ecosistema(pantalla)
 
+    # Resto del bucle principal (actualización de estado, dibujo, etc.)
+    for planta in plantas:
+        planta.fotosintesis()  # Actualizar la vida de las plantas
+        planta.dibujar_pl(pantalla)
+        
     # Dibujar animales
     for animal in lista_animales:
         animal.dibujar(pantalla)
