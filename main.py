@@ -149,8 +149,30 @@ class Depredador(Animal):
         super().__init__(posicion, vida, energia, velocidad, especie, dieta)
         self.presa = presa
 
-    def cazar(self):
-        pass
+    def cazar(self, presas, matriz):
+        # Comprobar si hay presas cerca
+        for presa in presas:
+            if abs(self.posicion[0] - presa.posicion[0]) <= 1 and abs(self.posicion[1] - presa.posicion[1]) <= 1:
+                # Moverse una casilla extra hacia la presa
+                dx = presa.posicion[0] - self.posicion[0]
+                dy = presa.posicion[1] - self.posicion[1]
+                self.mover(matriz, dx, dy)
+                # Comer la presa si está en la misma posición
+                if self.posicion == presa.posicion:
+                    self.vida += random.choice([1, 2])  # Gana 1 o 2 de vida
+                    presas.remove(presa)  # Remueve la presa de la lista
+
+    def mover(self, matriz, dx=None, dy=None):
+        tiempo_transcurrido = pygame.time.get_ticks()
+        if tiempo_transcurrido - self.ultimo_movimiento >= 1500:
+            if dx is None or dy is None:
+                dx, dy = direccion_aleatoria(2)
+            nuevo_x = self.posicion[0] + dx
+            nuevo_y = self.posicion[1] + dy
+
+            if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
+                self.posicion = (nuevo_x, nuevo_y)
+                self.ultimo_movimiento = tiempo_transcurrido
 
     def dibujar(self, pantalla):
         if self.sprite:
@@ -158,21 +180,6 @@ class Depredador(Animal):
         else:
             pygame.draw.rect(pantalla, (255, 0, 0),
                              (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
-    # Puedes agregar otros métodos específicos de los depredadores si es necesario
-    def mover(self, matriz):
-        # Implementa la lógica de movimiento específica para los depredadores
-        # En este ejemplo, el depredador se mueve a una nueva posición cada 1.5 segundos y puede moverse 2 sitios
-        tiempo_transcurrido = pygame.time.get_ticks()
-        if tiempo_transcurrido - self.ultimo_movimiento >= 1500:  # 1500 milisegundos = 1.5 segundos
-            dx, dy = direccion_aleatoria(2)  # Rango de movimiento para el depredador
-            nuevo_x = self.posicion[0] + dx
-            nuevo_y = self.posicion[1] + dy
-
-            # Verificar si la nueva posición está dentro de los límites de la matriz y si es una celda vacía (valor 0)
-            if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
-                # Actualizar la posición del depredador
-                self.posicion = (nuevo_x, nuevo_y)
-                self.ultimo_movimiento = tiempo_transcurrido
 
 def posicion_aleatoria_valida(matriz, valores_validos):
     while True:
@@ -185,6 +192,27 @@ class Presa(Animal):
     def __init__(self, posicion, vida, energia, velocidad, especie, dieta):
         super().__init__(posicion, vida, energia, velocidad, especie, dieta)
 
+    def huir(self, depredadores, matriz):
+        # Comprobar si hay depredadores cerca
+        for depredador in depredadores:
+            if abs(self.posicion[0] - depredador.posicion[0]) <= 1 and abs(self.posicion[1] - depredador.posicion[1]) <= 1:
+                # Moverse en dirección opuesta al depredador
+                dx = -(depredador.posicion[0] - self.posicion[0])
+                dy = -(depredador.posicion[1] - self.posicion[1])
+                self.mover(matriz, dx, dy)
+
+    def mover(self, matriz, dx=None, dy=None):
+        tiempo_transcurrido = pygame.time.get_ticks()
+        if tiempo_transcurrido - self.ultimo_movimiento >= 2000:
+            if dx is None or dy is None:
+                dx, dy = direccion_aleatoria(1)
+            nuevo_x = self.posicion[0] + dx
+            nuevo_y = self.posicion[1] + dy
+
+            if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
+                self.posicion = (nuevo_x, nuevo_y)
+                self.ultimo_movimiento = tiempo_transcurrido
+
     def dibujar(self, pantalla):
         if self.sprite:
             pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
@@ -193,17 +221,6 @@ class Presa(Animal):
                              (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
             
     # Puedes agregar métodos específicos de las presas si es necesario
-
-    def mover(self, matriz):
-        tiempo_transcurrido = pygame.time.get_ticks()
-        if tiempo_transcurrido - self.ultimo_movimiento >= 2000:
-            dx, dy = direccion_aleatoria(1)
-            nuevo_x = self.posicion[0] + dx
-            nuevo_y = self.posicion[1] + dy
-
-            if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
-                self.posicion = (nuevo_x, nuevo_y)
-                self.ultimo_movimiento = tiempo_transcurrido
 
 # Ejemplo de uso
 # presa1 = Presa((0, 0), 50, 30, 4, "Cebra", "Herbívoro")
