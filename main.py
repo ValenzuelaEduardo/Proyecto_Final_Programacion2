@@ -94,30 +94,21 @@ def direccion_aleatoria(rango_movimiento):
 class Animal(Organismo):
     def __init__(self, posicion, vida, energia, velocidad, especie, dieta):
         super().__init__(posicion, vida, energia, velocidad)
-        self.especie = especie    # Especie del animal
-        self.dieta = dieta        # Dieta: Carnívoro, Herbívoro, etc.
-        # Aquí elegimos el sprite en función de la especie y la dieta
+        self.especie = especie
+        self.dieta = dieta
         self.sprite = SPRITES_ANIMALES.get(f'{especie}{dieta}', None)
 
     def mover(self, matriz, rango_movimiento):
-        dx, dy = direccion_aleatoria(rango_movimiento)
-        nueva_x = self.posicion[0] + dx
-        nueva_y = self.posicion[1] + dy
+        for _ in range(10):  # Intentar 10 veces moverse a una posición válida
+            dx, dy = direccion_aleatoria(rango_movimiento)
+            nueva_x = self.posicion[0] + dx
+            nueva_y = self.posicion[1] + dy
 
-        # Verificar si la nueva posición está dentro de los límites del tablero
-        if 0 <= nueva_x < len(matriz[0]) and 0 <= nueva_y < len(matriz):
-            # Verificar si la celda está libre (es decir, si es pasto o arbusto)
-            if matriz[nueva_y][nueva_x] in [0, 2]:
-                # Actualizar la posición
-                self.posicion = (nueva_x, nueva_y)
-                # Aquí podrías decrementar la energía del animal si deseas
-                self.energia -= 1
-            else:
-                # Intentar otra dirección si el lugar está ocupado o no es válido
-                self.mover(matriz, rango_movimiento)
-        else:
-            # Intentar otra dirección si el lugar está fuera de los límites
-            self.mover(matriz, rango_movimiento)
+            if 0 <= nueva_x < len(matriz[0]) and 0 <= nueva_y < len(matriz):
+                if matriz[nueva_y][nueva_x] in [0, 2]:
+                    self.posicion = (nueva_x, nueva_y)
+                    self.energia -= 1
+                    break
 
     def cazar(self):
         pass
@@ -209,7 +200,12 @@ for planta in plantas:
 
 
     def reproducirse(self):
-        # Lógica para la reproducción por semillas
+        if planta in boards:
+            # Dibuja el sprite en la posición correspondiente
+            pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
+        else:
+            # Si no hay sprite, podrías dibujar un rectángulo o círculo como placeholder
+            pygame.draw.rect(pantalla, (255, 0, 0), (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
         pass
 
 class Ambiente:
@@ -220,29 +216,50 @@ class Ambiente:
         # Lógica para cambiar el clima
         pass
 
+    def dibujar_tablero(self, pantalla):
+        for y, fila in enumerate(matriz):
+            for x, valor in enumerate(fila):
+                imagen = IMAGENES.get(valor)
+                if imagen:
+                    pantalla.blit(imagen, (x * TAMANO_CELDA, y * TAMANO_CELDA))
+
 class Ecosistema:
     def __init__(self):
         self.organismos = []
         self.ambiente = Ambiente()
 
-    def dibujar_tablero(self, pantalla):  # Agrega 'self' y 'pantalla' como argumentos
-        for y, fila in enumerate(matriz):
-            for x, valor in enumerate(fila):
-                imagen = IMAGENES.get(valor)
-                if imagen:
-                    pantalla.blit(imagen, (x * TAMANO_CELDA, y * TAMANO_CELDA))  # Asegúrate de multiplicar por TAMANO_CELDA
+    def agregar_organismo(self, organismo):
+        """Agrega un organismo al ecosistema."""
+        self.organismos.append(organismo)
 
-def actualizar_animales(lista_animales, matriz):
-    for animal in lista_animales:
-        if animal.especie.startswith('depredador'):
-            animal.mover(matriz, 3)  # Rango de movimiento para depredadores
-        else:
-            animal.mover(matriz, 1)  # Rango de movimiento para animales normales
+    def ciclo_ecologico(self):
+        """Realiza un ciclo completo en el ecosistema."""
+        # Actualizar el clima u otros factores abióticos
+        self.ambiente.cambiar_clima()
+
+        # Actualizar los organismos en el ecosistema
+        for organismo in self.organismos:
+            organismo.actuar(self.organismos)
+
+        # Eliminar organismos que han muerto
+        self.organismos = [organismo for organismo in self.organismos if organismo.esta_vivo()]
+
+        # Puedes agregar más lógica según sea necesario para mantener el equilibrio ecológico
+
+    def dibujar_ecosistema(self, pantalla):
+        """Dibuja el estado actual del ecosistema en la pantalla."""
+        pantalla.fill((0, 0, 0))  # Limpia la pantalla antes de dibujar el nuevo frame
+
+        # Dibujar el tablero desde el ambiente
+        self.ambiente.dibujar_tablero(pantalla)
+
+        # Dibujar organismos
+        for organismo in self.organismos:
+            organismo.dibujar(pantalla)
 
 # Iniciar el ecosistema
 ecosistema = Ecosistema()
 
-# Bucle principal
 # Bucle principal
 corriendo = True
 while corriendo:
@@ -260,9 +277,9 @@ while corriendo:
 
     pantalla.fill((0, 0, 0))  # Limpia la pantalla antes de dibujar el nuevo frame
 
-    # Dibujar el tablero
-    ecosistema.dibujar_tablero(pantalla)
-    
+    # Dibujar el ecosistema
+    ecosistema.dibujar_ecosistema(pantalla)
+
     # Dibujar animales
     for animal in lista_animales:
         animal.dibujar(pantalla)
