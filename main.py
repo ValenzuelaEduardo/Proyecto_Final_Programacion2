@@ -1,6 +1,7 @@
 import pygame
 import random
 import sys
+import random
 
 # Inicialización de Pygame
 pygame.init()
@@ -89,21 +90,21 @@ for key, image in SPRITES_ANIMALES.items():
 pantalla = pygame.display.set_mode((ANCHO, ALTO))
 boards = [
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # Fila 1
-    [0,  2,  2,  2, 0, 0, 0, 0, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 3, 4], # Fila 2
-    [0,  2,  2,  2, 0, 0, 0, 0, 9, 10, 11, 0, 0, 0, 0, 0, 0, 0, 9, 10], #3
+    [0,  2,  2,  2, 0, 0, 0, 0, 3, 4, 5, 0, 2, 2, 2, 0, 0, 0, 3, 4], # Fila 2
+    [0,  2,  2,  2, 0, 0, 0, 0, 9, 10, 11, 0, 2, 2, 2, 0, 0, 0, 9, 10], #3
     [0,  2,  2,  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #4
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #5
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#6
-    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#7
-    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#8
-    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#9
-    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#10
-    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#11
-    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],#12
+    [0,  0,  0,  0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#7
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0],#8
+    [0,  0,  0,  2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0],#9
+    [0,  0,  0,  2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#10
+    [0,  0,  0,  2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#11
+    [0,  0,  0,  2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],#12
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],#13
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#14
-    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#15
-    [0,  3,  4,  4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0],#16
+    [0,  0,  0,  0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#15
+    [0,  3,  4,  4, 5, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0],#16
     [0,  6,  7,  7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0],#17
     [0,  6,  7,  7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#18
     [0,  9,  10, 10, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4], # Fila 19
@@ -136,12 +137,57 @@ class Animal(Organismo):
     def cazar(self):
         pass
 
+    def reproducirse(self, matriz, lista_animales):
+        # Probabilidad de reproducción
+        probabilidad_reproduccion = 0.01  # Puedes ajustar este valor según tus necesidades
+
+        # Verificar si el animal se reproduce y está vivo
+        if self.vida > 0 and random.random() < probabilidad_reproduccion and len(lista_animales) < 18:
+            # Crear un nuevo animal en una posición aleatoria
+            nuevo_x, nuevo_y = posicion_aleatoria_valida(matriz, [0, 2])
+
+            numerorandom = random.randint(1, 6)
+            nuevo_animal = Animal(
+                posicion=(nuevo_x, nuevo_y),
+                vida=100,
+                energia=50,
+                velocidad=5,
+                especie=f'normal{numerorandom}',
+                dieta="dietaEjemplo"
+            )
+            lista_animales.append(nuevo_animal)
+
+    def disminuir_vida(self):
+        # Disminuir gradualmente la vida del animal cada 2 segundos
+        tiempo_transcurrido = pygame.time.get_ticks()
+        if tiempo_transcurrido - self.ultimo_movimiento >= 2000:
+            self.vida -= 10  # Ajusta la cantidad de disminución según sea necesario
+            self.ultimo_movimiento = tiempo_transcurrido
+
     def dibujar(self, pantalla):
         if self.sprite:
             pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
         else:
             pygame.draw.rect(pantalla, (255, 0, 0),
                              (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
+
+    def mover(self, matriz):
+        tiempo_transcurrido = pygame.time.get_ticks()
+
+        # Solo permite el movimiento cada 2 segundos
+        if tiempo_transcurrido - self.ultimo_movimiento >= 1000:
+            dx, dy = direccion_aleatoria(1)  # Moverse en un radio de 1
+            nuevo_x = self.posicion[0] + dx
+            nuevo_y = self.posicion[1] + dy
+
+            # Verifica si la nueva posición es válida (dentro del rango de la matriz y en pasto o arbusto)
+            if (
+                0 <= nuevo_x < len(matriz[0])
+                and 0 <= nuevo_y < len(matriz)
+                and matriz[nuevo_y][nuevo_x] in [0, 2]
+            ):
+                self.posicion = (nuevo_x, nuevo_y)
+                self.ultimo_movimiento = tiempo_transcurrido
 
 class Depredador(Animal):
     def __init__(self, posicion, vida, energia, velocidad, especie, dieta, presa):
@@ -165,10 +211,10 @@ class Depredador(Animal):
     # Puedes agregar otros métodos específicos de los depredadores si es necesario
     def mover(self, matriz):
         # Implementa la lógica de movimiento específica para los depredadores
-        # Si hay presas dentro de un radio de 3 bloques, salta hacia la presa más cercana
+        # Si hay presas dentro de un radio de 2 bloques, salta hacia la presa más cercana
         presas_cercanas = [presa for presa in lista_animales if isinstance(presa, Presa)
-                           and abs(presa.posicion[0] - self.posicion[0]) <= 3
-                           and abs(presa.posicion[1] - self.posicion[1]) <= 3]
+                           and abs(presa.posicion[0] - self.posicion[0]) <= 2
+                           and abs(presa.posicion[1] - self.posicion[1]) <= 2]
 
         if presas_cercanas:
             presa_cercana = min(presas_cercanas, key=lambda p: abs(p.posicion[0] - self.posicion[0]) +
@@ -176,7 +222,7 @@ class Depredador(Animal):
             self.posicion = presa_cercana.posicion
         else:
             tiempo_transcurrido = pygame.time.get_ticks()
-            if tiempo_transcurrido - self.ultimo_movimiento >= 1500:
+            if tiempo_transcurrido - self.ultimo_movimiento >= 1000:
                 dx, dy = direccion_aleatoria(2)
                 nuevo_x = self.posicion[0] + dx
                 nuevo_y = self.posicion[1] + dy
@@ -204,30 +250,6 @@ class Presa(Animal):
                              (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
             
     # Puedes agregar métodos específicos de las presas si es necesario
-    def actualizar_posicion(self):
-        tiempo_transcurrido = pygame.time.get_ticks()
-        if tiempo_transcurrido - self.ultimo_movimiento >= 2000:
-            dx, dy = direccion_aleatoria(1)
-            nuevo_x = self.posicion[0] + dx
-            nuevo_y = self.posicion[1] + dy
-
-            if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
-                self.posicion = (nuevo_x, nuevo_y)
-                self.ultimo_movimiento = tiempo_transcurrido
-
-    def mover(self, matriz):
-        tiempo_transcurrido = pygame.time.get_ticks()
-        if tiempo_transcurrido - self.ultimo_movimiento >= 2000:
-            dx, dy = direccion_aleatoria(1)
-            nuevo_x = self.posicion[0] + dx
-            nuevo_y = self.posicion[1] + dy
-
-            if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
-                self.posicion = (nuevo_x, nuevo_y)
-                self.ultimo_movimiento = tiempo_transcurrido
-
-# Ejemplo de uso
-# presa1 = Presa((0, 0), 50, 30, 4, "Cebra", "Herbívoro")
 
 valores_cesped_arbustos = [0, 2]
 
@@ -262,26 +284,34 @@ class Planta(Organismo):
         self.idplanta = idplanta
         self.sprite = SPRITE_PLANTAS.get(f'{tipo}{idplanta}', None)
         self.reproducciones = 0
-        self.ultimo_movimiento = 0 
+        self.ultimo_movimiento = 0
 
-    def fotosintesis(self):
-        # Asumimos que la fotosíntesis siempre es exitosa por simplicidad
-        self.vida += 1  # La planta gana 1 de vida
-        self.energia += 1  # También podría ganar energía si así lo deseas
+    def fotosintesis(self, es_de_noche):
+        if es_de_noche:
+            self.vida -= 3  # Ajusta la cantidad de pérdida de vida durante la noche
+        else:
+            self.vida += 1  # Ajusta la cantidad de ganancia de vida durante el día
+            self.energia += 1  # También podría ganar energía si así lo deseas
+
+    def disminuir_vida(self):
+        # Disminuir gradualmente la vida de la planta cada 5 segundos
+        tiempo_transcurrido = pygame.time.get_ticks()
+        if tiempo_transcurrido - self.ultimo_movimiento >= 5000:
+            self.vida -= 5  # Ajusta la cantidad de disminución según sea necesario
+            self.ultimo_movimiento = tiempo_transcurrido
 
     def dibujar_pl(self, pantalla):
         if self.sprite:
-            # Dibuja el sprite en la posición correspondiente
             pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
         else:
-            # Si no hay sprite, podrías dibujar un rectángulo o círculo como placeholder
-            pygame.draw.rect(pantalla, (20, 255, 0), (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
+            pygame.draw.rect(pantalla, (20, 255, 0),
+                             (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
 
     def reproducirse(self):
         tiempo_transcurrido = pygame.time.get_ticks()
 
         # Asegúrate de que no se haya alcanzado el límite de reproducciones y el límite de plantas
-        if tiempo_transcurrido - self.ultimo_movimiento >= 5000 and self.reproducciones < 4 and len(lista_plantas) < 20:
+        if tiempo_transcurrido - self.ultimo_movimiento >= 9000 and self.reproducciones < 1 and len(lista_plantas) < 15:
             # Intentar reproducirse en un lado aleatorio
             dx, dy = direccion_aleatoria(1)
             nuevo_x = self.posicion[0] + dx
@@ -325,7 +355,7 @@ class Ambiente:
         self.factores = []  # Lista de factores abióticos
         self.es_de_noche = False  # Nuevo atributo para seguir el estado del clima
         self.tiempo_transcurrido = 0  # Nuevo atributo para seguir el tiempo transcurrido
-        self.tiempo_cambio_clima = 5000  # Cambiado a 5000 milisegundos para que sea cada 5 segundos
+        self.tiempo_cambio_clima = 15000  # Cambiado a 5000 milisegundos para que sea cada 5 segundos
 
     def cambiar_clima(self):
         self.es_de_noche = not self.es_de_noche  # Cambiar entre True y False
@@ -334,7 +364,7 @@ class Ambiente:
     
     def actualizar_tiempo(self, tiempo):
         self.tiempo_transcurrido += tiempo
-        # Cambia el clima cada 5 segundos y reinicia el temporizador
+        # Cambia el clima cada 15 segundos y reinicia el temporizador
         if self.tiempo_transcurrido >= self.tiempo_cambio_clima:
             self.cambiar_clima()
         
@@ -416,17 +446,27 @@ while corriendo:
         depredador.actualizar_posiciones_presas([animal for animal in lista_animales if isinstance(animal, Presa)])
         depredador.mover(matriz)
 
-    for presa in [animal for animal in lista_animales if isinstance(animal, Presa)]:
-        presa.actualizar_posicion()
-
-    
     for planta in lista_plantas:
-        planta.fotosintesis()  # Actualizar la vida de las plantas
+        planta.fotosintesis(ecosistema.ambiente.es_de_noche)  # Actualizar la vida de las plantas según el clima
         planta.reproducirse()  # Intentar reproducirse
         planta.dibujar_pl(pantalla)
 
-        
+        # Verificar si la vida de la planta llega a 0 y eliminarla
+        if planta.vida <= 0:
+            lista_plantas.remove(planta)
+
+
+            
     for animal in lista_animales:
+        if isinstance(animal, Animal):
+            animal.disminuir_vida()  # Llama al método para disminuir la vida
+            animal.mover(matriz)  # Llamada a la función mover para los animales de especie normal
+            animal.reproducirse(matriz, lista_animales)  # Intentar reproducirse
+
+            # Verificar si la vida del animal llega a 0 y eliminarlo
+            if animal.vida <= 0:
+                lista_animales.remove(animal)
+
         animal.dibujar(pantalla)
     pygame.display.flip()  # Actualiza la pantalla completa
 
