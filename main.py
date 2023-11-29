@@ -1,5 +1,6 @@
 import pygame
 import random
+import sys
 
 # Inicialización de Pygame
 pygame.init()
@@ -15,7 +16,6 @@ TAMANO_CELDA = 40
 IMAGENES = {
     0: pygame.image.load('assets/map_images/pasto.png'),   # Pasto
     1: pygame.image.load('assets/map_images/planta.png'),    # Agujero
-    2: pygame.image.load('assets/map_images/arbusto.png'),    # Arbusto
     3: pygame.image.load('assets/map_images/AguaSupL.png'), 
     4: pygame.image.load('assets/map_images/AguaSup.png'), 
     5: pygame.image.load('assets/map_images/AguaSupR.png'), 
@@ -25,12 +25,41 @@ IMAGENES = {
     9: pygame.image.load('assets/map_images/AguaAbajoL.png'), 
     10: pygame.image.load('assets/map_images/AguaAbajo.png'), 
     11: pygame.image.load('assets/map_images/AguaAbajoR.png'), 
-    12: pygame.image.load('assets/map_images/planta1.png'), 
-    
 }
 
 for key, image in IMAGENES.items():
     IMAGENES[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
+
+SPRITE_PLANTAS={
+    1: pygame.image.load('assets/map_images/planta.png'),
+    2: pygame.image.load('assets/map_images/arbusto.png'),      
+    12: pygame.image.load('assets/map_images/planta1.png'),     
+}
+
+for key, image in SPRITE_PLANTAS.items():
+    SPRITE_PLANTAS[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
+
+# Cargar y escalar imágenes
+IMAGENES_NOCHE = {
+    0: pygame.image.load('assets/noche/pasto.png'),   # Pasto
+    1: pygame.image.load('assets/noche/planta.png'),    # Agujero
+    2: pygame.image.load('assets/noche/arbusto.png'),    # Arbusto
+    3: pygame.image.load('assets/noche/AguaSupL.png'), 
+    4: pygame.image.load('assets/noche/AguaSup.png'), 
+    5: pygame.image.load('assets/noche/AguaSupR.png'), 
+    6: pygame.image.load('assets/noche/AguaL.png'), 
+    7: pygame.image.load('assets/noche/Agua.png'), 
+    8: pygame.image.load('assets/noche/AguaR.png'), 
+    9: pygame.image.load('assets/noche/AguaAbajoL.png'), 
+    10: pygame.image.load('assets/noche/AguaAbajo.png'), 
+    11: pygame.image.load('assets/noche/AguaAbajoR.png'), 
+    12: pygame.image.load('assets/noche/planta1.png'), 
+    
+}
+
+for key, image in IMAGENES_NOCHE.items():
+    IMAGENES_NOCHE[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
+
     
 SPRITES_ANIMALES = {
     'depredador1': pygame.image.load('assets/depredador/depredador1.png'),
@@ -51,28 +80,29 @@ for key, image in SPRITES_ANIMALES.items():
     SPRITES_ANIMALES[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
 
 
+
 # Crear la ventana
 pantalla = pygame.display.set_mode((ANCHO, ALTO))
 boards = [
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # Fila 1
-    [0,  1,  1,  1, 0, 2, 2, 0, 3, 4, 0, 1, 1, 1, 0, 2, 2, 0, 3, 4], # Fila 2
-    [0,  0,  0,  0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #3
-    [0,  0,  0,  0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #4
-    [0,  0,  0,  12, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #5
+    [0,  0,  0,  0, 0, 0, 0, 0, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4], # Fila 2
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #3
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #4
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #5
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#6
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#7
-    [0,  0,  0,  0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#8
-    [0,  0,  0,  0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#9
-    [0,  0,  0,  0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#10
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#8
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#9
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#10
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#11
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#12
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#13
-    [0,  0,  0,  12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#14
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#14
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#15
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#16
     [0,  3,  4,  4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#17
     [0,  6,  7,  7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#18
-    [0,  9,  10, 10, 11, 2, 2, 2, 2, 2, 0, 1, 1, 1, 0, 2, 2, 0, 3, 4], # Fila 19
+    [0,  9,  10, 10, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4], # Fila 19
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] # Fila 20
 ]
 # Asignamos la matriz a una variable para facilitar su uso
@@ -183,11 +213,20 @@ class Planta(Organismo):
     def __init__(self, posicion, vida, energia):
         super().__init__(posicion, vida, energia, velocidad=0)  # Las plantas no se mueven
         self.tipo = 'planta'
+        self.sprite = SPRITE_PLANTAS.get(f'{vida}{energia}', None)
 
     def fotosintesis(self):
         # Asumimos que la fotosíntesis siempre es exitosa por simplicidad
         self.vida += 1  # La planta gana 1 de vida
         self.energia += 1  # También podría ganar energía si así lo deseas
+
+    def dibujar(self, pantalla):
+        if self.sprite:
+            # Dibuja el sprite en la posición correspondiente
+            pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
+        else:
+            # Si no hay sprite, podrías dibujar un rectángulo o círculo como placeholder
+            pygame.draw.rect(pantalla, (255, 0, 0), (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
 
 posiciones_de_plantas = []
 # Ejemplo de cómo podrías actualizar la vida de las plantas en el juego
@@ -260,8 +299,14 @@ class Ecosistema:
 # Iniciar el ecosistema
 ecosistema = Ecosistema()
 
+# Variable para controlar el tiempo transcurrido
+tiempo_transcurrido = 0
+tiempo_cambio_clima = 10000  # 30 segundos en milisegundos
+
 # Bucle principal
 corriendo = True
+reloj = pygame.time.Clock()
+
 while corriendo:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -275,6 +320,14 @@ while corriendo:
     for planta in plantas:
         planta.fotosintesis()  # Actualizar la vida de las plantas
 
+    # Medir el tiempo transcurrido
+    tiempo_transcurrido += reloj.tick()
+
+    # Cambiar el clima cada 30 segundos
+    if tiempo_transcurrido >= tiempo_cambio_clima:
+        ecosistema.ambiente.cambiar_clima()  # Acceder al ambiente a través del ecosistema
+        tiempo_transcurrido = 0  # Reiniciar el contador de tiempo
+
     pantalla.fill((0, 0, 0))  # Limpia la pantalla antes de dibujar el nuevo frame
 
     # Dibujar el ecosistema
@@ -287,3 +340,4 @@ while corriendo:
     pygame.display.flip()  # Actualiza la pantalla completa
 
 pygame.quit()
+sys.exit()
