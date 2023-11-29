@@ -1,0 +1,289 @@
+import pygame
+import random
+import pygame.time
+
+# Inicialización de Pygame
+pygame.init()
+
+# Dimensiones de la ventana
+ANCHO = 800
+ALTO = 800
+
+# Tamaño del cuadrado (celda)
+TAMANO_CELDA = 40
+
+# Cargar y escalar imágenes
+IMAGENES = {
+    0: pygame.image.load('assets/map_images/pasto.png'),   # Pasto
+    1: pygame.image.load('assets/map_images/planta.png'),    # Agujero
+    2: pygame.image.load('assets/map_images/arbusto.png'),    # Arbusto
+    3: pygame.image.load('assets/map_images/AguaSupL.png'),
+    4: pygame.image.load('assets/map_images/AguaSup.png'),
+    5: pygame.image.load('assets/map_images/AguaSupR.png'),
+    6: pygame.image.load('assets/map_images/AguaL.png'),
+    7: pygame.image.load('assets/map_images/Agua.png'),
+    8: pygame.image.load('assets/map_images/AguaR.png'),
+    9: pygame.image.load('assets/map_images/AguaAbajoL.png'),
+    10: pygame.image.load('assets/map_images/AguaAbajo.png'),
+    11: pygame.image.load('assets/map_images/AguaAbajoR.png'),
+    12: pygame.image.load('assets/map_images/planta1.png'),
+}
+
+for key, image in IMAGENES.items():
+    IMAGENES[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
+
+SPRITES_ANIMALES = {
+    'depredador1': pygame.image.load('assets/depredador/depredador1.png'),
+    'depredador2': pygame.image.load('assets/depredador/depredador2.png'),
+    'depredador3': pygame.image.load('assets/depredador/depredador3.png'),
+    'depredador4': pygame.image.load('assets/depredador/depredador4.png'),
+    # ... Añade el resto de los sprites de depredadores
+    'normal1': pygame.image.load('assets/presas/normal1.png'),
+    'normal2': pygame.image.load('assets/presas/normal2.png'),
+    'normal3': pygame.image.load('assets/presas/normal3.png'),
+    'normal4': pygame.image.load('assets/presas/normal4.png'),
+    'normal5': pygame.image.load('assets/presas/normal5.png'),
+    'normal6': pygame.image.load('assets/presas/normal6.png'),
+    # ... Añade el resto de los sprites normales
+}
+
+for key, image in SPRITES_ANIMALES.items():
+    SPRITES_ANIMALES[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
+
+# Crear la ventana
+pantalla = pygame.display.set_mode((ANCHO, ALTO))
+boards = [
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 1
+    [0,  1,  1,  1, 0, 2, 2, 0, 3, 4, 0, 1, 1, 1, 0, 2, 2, 0, 3, 4],  # Fila 2
+    [0,  0,  0,  0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 3
+    [0,  0,  0,  0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 4
+    [0,  0,  0,  12, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 5
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 6
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 7
+    [0,  0,  0,  0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 8
+    [0,  0,  0,  0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 9
+    [0,  0,  0,  0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 10
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 11
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 12
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 13
+    [0,  0,  0,  12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 14
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 15
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 16
+    [0,  3,  4,  4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 17
+    [0,  6,  7,  7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Fila 18
+    [0,  9,  10, 10, 11, 2, 2, 2, 2, 2, 0, 1, 1, 1, 0, 2, 2, 0, 3, 4],  # Fila 19
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # Fila 20
+]
+# Asignamos la matriz a una variable para facilitar su uso
+matriz = boards
+# Clases del ecosistema
+
+class Organismo:
+    def __init__(self, posicion, vida, energia, velocidad):
+        self.posicion = posicion
+        self.vida = vida
+        self.energia = energia
+        self.velocidad = velocidad
+
+def direccion_aleatoria(rango_movimiento):
+    dx = random.randint(-rango_movimiento, rango_movimiento)
+    dy = random.randint(-rango_movimiento, rango_movimiento)
+    return dx, dy
+
+class Animal(Organismo):
+    def __init__(self, posicion, vida, energia, velocidad, especie, dieta):
+        super().__init__(posicion, vida, energia, velocidad)
+        self.especie = especie
+        self.dieta = dieta
+        self.sprite = SPRITES_ANIMALES.get(especie, None)
+        self.ultimo_movimiento = 0
+
+    def cazar(self):
+        pass
+
+    def dibujar(self, pantalla):
+        if self.sprite:
+            pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
+        else:
+            pygame.draw.rect(pantalla, (255, 0, 0),
+                             (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
+
+class Depredador(Animal):
+    def __init__(self, posicion, vida, energia, velocidad, especie, dieta, presa):
+        super().__init__(posicion, vida, energia, velocidad, especie, dieta)
+        self.presa = presa
+
+    def cazar(self):
+        pass
+
+    def dibujar(self, pantalla):
+        if self.sprite:
+            pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
+        else:
+            pygame.draw.rect(pantalla, (255, 0, 0),
+                             (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
+    # Puedes agregar otros métodos específicos de los depredadores si es necesario
+    def mover(self, matriz):
+        # Implementa la lógica de movimiento específica para los depredadores
+        # En este ejemplo, el depredador se mueve a una nueva posición cada 1.5 segundos y puede moverse 2 sitios
+        tiempo_transcurrido = pygame.time.get_ticks()
+        if tiempo_transcurrido - self.ultimo_movimiento >= 1500:  # 1500 milisegundos = 1.5 segundos
+            dx, dy = direccion_aleatoria(2)  # Rango de movimiento para el depredador
+            nuevo_x = self.posicion[0] + dx
+            nuevo_y = self.posicion[1] + dy
+
+            # Verificar si la nueva posición está dentro de los límites de la matriz y si es una celda vacía (valor 0)
+            if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
+                # Actualizar la posición del depredador
+                self.posicion = (nuevo_x, nuevo_y)
+                self.ultimo_movimiento = tiempo_transcurrido
+
+def posicion_aleatoria_valida(matriz, valores_validos):
+    while True:
+        x = random.randint(0, len(matriz[0]) - 1)
+        y = random.randint(0, len(matriz) - 1)
+        if matriz[y][x] in valores_validos:
+            return x, y
+
+class Presa(Animal):
+    def __init__(self, posicion, vida, energia, velocidad, especie, dieta):
+        super().__init__(posicion, vida, energia, velocidad, especie, dieta)
+
+    def dibujar(self, pantalla):
+        if self.sprite:
+            pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
+        else:
+            pygame.draw.rect(pantalla, (255, 0, 0),
+                             (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
+            
+    # Puedes agregar métodos específicos de las presas si es necesario
+
+    def mover(self, matriz):
+        tiempo_transcurrido = pygame.time.get_ticks()
+        if tiempo_transcurrido - self.ultimo_movimiento >= 2000:
+            dx, dy = direccion_aleatoria(1)
+            nuevo_x = self.posicion[0] + dx
+            nuevo_y = self.posicion[1] + dy
+
+            if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
+                self.posicion = (nuevo_x, nuevo_y)
+                self.ultimo_movimiento = tiempo_transcurrido
+
+# Ejemplo de uso
+# presa1 = Presa((0, 0), 50, 30, 4, "Cebra", "Herbívoro")
+
+valores_cesped_arbustos = [0, 2]
+
+lista_animales = []
+for i in range(6):
+    # Añadir animales en posiciones aleatorias donde haya pasto o arbustos
+    lista_animales.append(Animal(
+        posicion_aleatoria_valida(matriz, valores_cesped_arbustos),
+        100,             # vida
+        50,              # energía
+        5,               # velocidad
+        f'normal{i+1}',  # especie
+        'DietaEjemplo'   # Proporciona una dieta válida
+    ))
+
+for i in range(4):
+    # Añadir depredadores en posiciones aleatorias donde haya pasto o arbustos
+    lista_animales.append(Depredador(
+        posicion_aleatoria_valida(matriz, valores_cesped_arbustos),
+        100,             # vida
+        50,              # energía
+        5,               # velocidad
+        f'depredador{i+1}',    # especie
+        'DietaEjemplo',  # Proporciona una dieta válida
+        'PresaEjemplo'   # Proporciona una presa válida
+    ))
+
+class Planta(Organismo):
+    def __init__(self, posicion, vida, energia):
+        super().__init__(posicion, vida, energia, velocidad=0)
+        self.tipo = 'planta'
+
+    def fotosintesis(self):
+        self.vida += 1
+        self.energia += 1
+
+    def reproducirse(self):
+        pass
+
+posiciones_de_plantas = []
+# Ejemplo de cómo podrías actualizar la vida de las plantas en el juego
+# Suponiendo que tienes una lista de todas las plantas en el juego
+plantas = [Planta((x, y), vida=5, energia=10) for x, y in posiciones_de_plantas]
+
+# Después de cada ciclo en el juego, podrías llamar a la fotosíntesis para cada planta
+for planta in plantas:
+    planta.fotosintesis()
+
+
+    def reproducirse(self):
+        # Lógica para la reproducción por semillas
+        pass
+
+class Ambiente:
+    def __init__(self):
+        self.factores = []  # Lista de factores abióticos
+
+    def cambiar_clima(self):
+        # Lógica para cambiar el clima
+        pass
+
+class Ecosistema:
+    def __init__(self):
+        self.organismos = []
+        self.ambiente = Ambiente()
+
+    def dibujar_tablero(self, pantalla):  # Agrega 'self' y 'pantalla' como argumentos
+        for y, fila in enumerate(matriz):
+            for x, valor in enumerate(fila):
+                imagen = IMAGENES.get(valor)
+                if imagen:
+                    pantalla.blit(imagen, (x * TAMANO_CELDA, y * TAMANO_CELDA))  # Asegúrate de multiplicar por TAMANO_CELDA
+
+def actualizar_animales(lista_animales, matriz):
+    for animal in lista_animales:
+        if animal.especie.startswith('depredador'):
+            animal.mover(matriz, 3)  # Rango de movimiento para depredadores
+        else:
+            animal.mover(matriz, 1)  # Rango de movimiento para animales normales
+
+# Iniciar el ecosistema
+ecosistema = Ecosistema()
+
+# Bucle principal
+corriendo = True
+reloj = pygame.time.Clock()
+while corriendo:
+    for evento in pygame.event.get():
+        if evento.type == pygame.QUIT:
+            corriendo = False
+        elif evento.type == pygame.KEYDOWN:
+            if evento.key == pygame.K_SPACE:
+                pass
+
+    for planta in plantas:
+        planta.fotosintesis()
+
+    pantalla.fill((0, 0, 0))
+
+    ecosistema.dibujar_tablero(pantalla)
+
+    for depredador in [animal for animal in lista_animales if isinstance(animal, Depredador)]:
+        depredador.mover(matriz)
+        
+    for presa in [animal for animal in lista_animales if isinstance(animal, Presa)]:
+        print(f"Presa en posición: {presa.posicion}")
+        presa.mover(matriz)
+
+    for animal in lista_animales:
+        animal.dibujar(pantalla)
+
+    pygame.display.flip()
+    
+    reloj.tick(30)
+
+pygame.quit()
