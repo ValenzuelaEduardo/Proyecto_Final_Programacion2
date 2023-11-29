@@ -1,7 +1,5 @@
-import copy
 import pygame
-import random 
-from random import choice 
+import random
 import sys
 
 # Inicialización de Pygame
@@ -28,6 +26,7 @@ IMAGENES = {
     9: pygame.image.load('assets/map_images/AguaAbajoL.png'), 
     10: pygame.image.load('assets/map_images/AguaAbajo.png'), 
     11: pygame.image.load('assets/map_images/AguaAbajoR.png'), 
+    13: pygame.image.load('assets/map_images/restos.png')
 }
 
 for key, image in IMAGENES.items():
@@ -90,8 +89,8 @@ for key, image in SPRITES_ANIMALES.items():
 pantalla = pygame.display.set_mode((ANCHO, ALTO))
 boards = [
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # Fila 1
-    [0,  2,  2,  2, 0, 0, 0, 0, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4], # Fila 2
-    [0,  2,  2,  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #3
+    [0,  2,  2,  2, 0, 0, 0, 0, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 3, 4], # Fila 2
+    [0,  2,  2,  2, 0, 0, 0, 0, 9, 10, 11, 0, 0, 0, 0, 0, 0, 0, 9, 10], #3
     [0,  2,  2,  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #4
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #5
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#6
@@ -104,11 +103,11 @@ boards = [
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],#13
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#14
     [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#15
-    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0],#16
-    [0,  3,  4,  4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0],#17
+    [0,  3,  4,  4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0],#16
+    [0,  6,  7,  7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0],#17
     [0,  6,  7,  7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],#18
     [0,  9,  10, 10, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4], # Fila 19
-    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] # Fila 20
+    [0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 10] # Fila 20
 ]
 # Asignamos la matriz a una variable para facilitar su uso
 matriz = boards
@@ -149,40 +148,42 @@ class Depredador(Animal):
         super().__init__(posicion, vida, energia, velocidad, especie, dieta)
         self.presa = presa
 
-    def cazar(self, presas, matriz):
-        # Comprobar si hay presas cerca
+    def cazar(self):
+        pass
+
+    def actualizar_posiciones_presas(self, presas):
+        # Actualiza la posición de cada presa en la lista
         for presa in presas:
-            if abs(self.posicion[0] - presa.posicion[0]) <= 1 and abs(self.posicion[1] - presa.posicion[1]) <= 1:
-                # Moverse una casilla extra hacia la presa
-                dx = presa.posicion[0] - self.posicion[0]
-                dy = presa.posicion[1] - self.posicion[1]
-                self.mover(matriz, dx, dy)
-                # Comer la presa si está en la misma posición
-                if self.posicion == presa.posicion:
-                    self.vida += random.choice([1, 2])  # Gana 1 o 2 de vida
-                    presas.remove(presa)  # Remueve la presa de la lista
+            presa.actualizar_posicion()
 
-
+    def dibujar(self, pantalla):
+        if self.sprite:
+            pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
+        else:
+            pygame.draw.rect(pantalla, (255, 0, 0),
+                             (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
+    # Puedes agregar otros métodos específicos de los depredadores si es necesario
     def mover(self, matriz):
         # Implementa la lógica de movimiento específica para los depredadores
-        # En este ejemplo, el depredador se mueve a una nueva posición cada 1.5 segundos y puede moverse 2 sitios
-        tiempo_transcurrido = pygame.time.get_ticks()
-        if tiempo_transcurrido - self.ultimo_movimiento >= 1500:  # 1500 milisegundos = 1.5 segundos
-            dx, dy = direccion_aleatoria(2)  # Rango de movimiento para el depredador
-            nuevo_x = self.posicion[0] + dx
-            nuevo_y = self.posicion[1] + dy
-            def dibujar(self, pantalla):
-                    if self.sprite:
-                        pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
-                    else:
-                        pygame.draw.rect(pantalla, (255, 0, 0),
-                                        (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
-                # Puedes agregar otros métodos específicos de los depredadores si es necesario
-            # Verificar si la nueva posición está dentro de los límites de la matriz y si es una celda vacía (valor 0)
-            if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
-                # Actualizar la posición del depredador
-                self.posicion = (nuevo_x, nuevo_y)
-                self.ultimo_movimiento = tiempo_transcurrido
+        # Si hay presas dentro de un radio de 3 bloques, salta hacia la presa más cercana
+        presas_cercanas = [presa for presa in lista_animales if isinstance(presa, Presa)
+                           and abs(presa.posicion[0] - self.posicion[0]) <= 3
+                           and abs(presa.posicion[1] - self.posicion[1]) <= 3]
+
+        if presas_cercanas:
+            presa_cercana = min(presas_cercanas, key=lambda p: abs(p.posicion[0] - self.posicion[0]) +
+                                                             abs(p.posicion[1] - self.posicion[1]))
+            self.posicion = presa_cercana.posicion
+        else:
+            tiempo_transcurrido = pygame.time.get_ticks()
+            if tiempo_transcurrido - self.ultimo_movimiento >= 1500:
+                dx, dy = direccion_aleatoria(2)
+                nuevo_x = self.posicion[0] + dx
+                nuevo_y = self.posicion[1] + dy
+
+                if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
+                    self.posicion = (nuevo_x, nuevo_y)
+                    self.ultimo_movimiento = tiempo_transcurrido
 
 def posicion_aleatoria_valida(matriz, valores_validos):
     while True:
@@ -203,30 +204,29 @@ class Presa(Animal):
                              (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
             
     # Puedes agregar métodos específicos de las presas si es necesario
-
-    def mover(self, matriz, tiempo_transcurrido):
-        self.ultimo_movimiento += tiempo_transcurrido
-        if self.ultimo_movimiento >= 2000:
-            dx, dy = self.direccion_aleatoria()  # Asumiendo que esta función devuelve un par (dx, dy)
+    def actualizar_posicion(self):
+        tiempo_transcurrido = pygame.time.get_ticks()
+        if tiempo_transcurrido - self.ultimo_movimiento >= 2000:
+            dx, dy = direccion_aleatoria(1)
             nuevo_x = self.posicion[0] + dx
             nuevo_y = self.posicion[1] + dy
 
-            # Asegúrate de que la nueva posición esté dentro de los límites y sea una posición válida
             if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
-                # Actualizar la posición de la presa
                 self.posicion = (nuevo_x, nuevo_y)
-                # Restablecer el contador de tiempo para el próximo movimiento
-                self.ultimo_movimiento = 0
+                self.ultimo_movimiento = tiempo_transcurrido
 
-    def huir(self, depredadores, matriz):
-        # Comprobar si hay depredadores cerca
-        for depredador in depredadores:
-            if abs(self.posicion[0] - depredador.posicion[0]) <= 1 and abs(self.posicion[1] - depredador.posicion[1]) <= 1:
-                # Moverse en dirección opuesta al depredador
-                dx = -(depredador.posicion[0] - self.posicion[0])
-                dy = -(depredador.posicion[1] - self.posicion[1])
-                self.mover(matriz, dx, dy)
+    def mover(self, matriz):
+        tiempo_transcurrido = pygame.time.get_ticks()
+        if tiempo_transcurrido - self.ultimo_movimiento >= 2000:
+            dx, dy = direccion_aleatoria(1)
+            nuevo_x = self.posicion[0] + dx
+            nuevo_y = self.posicion[1] + dy
 
+            if 0 <= nuevo_x < len(matriz[0]) and 0 <= nuevo_y < len(matriz) and matriz[nuevo_y][nuevo_x] == 0:
+                self.posicion = (nuevo_x, nuevo_y)
+                self.ultimo_movimiento = tiempo_transcurrido
+
+# Ejemplo de uso
 # presa1 = Presa((0, 0), 50, 30, 4, "Cebra", "Herbívoro")
 
 valores_cesped_arbustos = [0, 2]
@@ -257,43 +257,52 @@ for i in range(4):
 
 class Planta(Organismo):
     def __init__(self, posicion, vida, energia, tipo, idplanta):
-        super().__init__(posicion, vida, energia, velocidad=0)
+        super().__init__(posicion, vida, energia, velocidad=0)  # Las plantas no se mueven
         self.tipo = tipo
         self.idplanta = idplanta
         self.sprite = SPRITE_PLANTAS.get(f'{tipo}{idplanta}', None)
-        self.tiempo_para_reproducirse = 15000  # 15 segundos en milisegundos
-        self.tiempo_desde_ultima_reproduccion = 0
+        self.reproducciones = 0
+        self.ultimo_movimiento = 0 
 
-    def reproducirse(self, lista_plantas, matriz, valores_cesped_arbustos):
-        # Encuentra posiciones adyacentes libres para la nueva planta
-        posiciones_adyacentes_libres = [
-            (self.posicion[0] + dx, self.posicion[1] + dy)
-            for dx in range(-1, 2)
-            for dy in range(-1, 2)
-            if (dx != 0 or dy != 0)  # Evita la posición actual de la planta
-            and 0 <= self.posicion[0] + dx < len(matriz[0])  # Verifica límites horizontales
-            and 0 <= self.posicion[1] + dy < len(matriz)     # Verifica límites verticales
-            and (self.posicion[0] + dx, self.posicion[1] + dy) not in posiciones_de_plantas  # Verifica que no haya otra planta
-            and matriz[self.posicion[1] + dy][self.posicion[0] + dx] in valores_cesped_arbustos
-        ]
+    def fotosintesis(self):
+        # Asumimos que la fotosíntesis siempre es exitosa por simplicidad
+        self.vida += 1  # La planta gana 1 de vida
+        self.energia += 1  # También podría ganar energía si así lo deseas
 
-        # Si hay posiciones libres disponibles
-        if posiciones_adyacentes_libres:
-            nueva_posicion = random.choice(posiciones_adyacentes_libres)
-            # Asumiendo que cada planta tiene un ID único y que idplanta es un entero
-            nueva_idplanta = max(planta.idplanta for planta in lista_plantas) + 1
-            nueva_planta = Planta(
-                nueva_posicion,
-                100,  # vida inicial
-                50,   # energía inicial
-                self.tipo,
-                nueva_idplanta
-            )
-            lista_plantas.append(nueva_planta)
-            posiciones_de_plantas.append(nueva_posicion)  # Agregar la nueva posición a la lista de posiciones ocupadas
+    def dibujar_pl(self, pantalla):
+        if self.sprite:
+            # Dibuja el sprite en la posición correspondiente
+            pantalla.blit(self.sprite, (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA))
+        else:
+            # Si no hay sprite, podrías dibujar un rectángulo o círculo como placeholder
+            pygame.draw.rect(pantalla, (20, 255, 0), (self.posicion[0] * TAMANO_CELDA, self.posicion[1] * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA))
 
-    def actualizar_tiempo_reproduccion(self, tiempo_transcurrido):
-        self.tiempo_desde_ultima_reproduccion += tiempo_transcurrido
+    def reproducirse(self):
+        tiempo_transcurrido = pygame.time.get_ticks()
+
+        # Asegúrate de que no se haya alcanzado el límite de reproducciones y el límite de plantas
+        if tiempo_transcurrido - self.ultimo_movimiento >= 5000 and self.reproducciones < 4 and len(lista_plantas) < 20:
+            # Intentar reproducirse en un lado aleatorio
+            dx, dy = direccion_aleatoria(1)
+            nuevo_x = self.posicion[0] + dx
+            nuevo_y = self.posicion[1] + dy
+
+            if (
+                0 <= nuevo_x < len(matriz[0])
+                and 0 <= nuevo_y < len(matriz)
+                and matriz[nuevo_y][nuevo_x] in [0, 2]
+            ):
+                # Crear una nueva planta en la posición adecuada
+                nueva_planta = Planta(
+                    posicion=(nuevo_x, nuevo_y),
+                    vida=100,  # Puedes ajustar estos valores según sea necesario
+                    energia=50,
+                    tipo=self.tipo,
+                    idplanta=self.idplanta,
+                )
+                lista_plantas.append(nueva_planta)
+                self.reproducciones += 1
+                self.ultimo_movimiento = tiempo_transcurrido
 
 posiciones_de_plantas = []
 lista_plantas = []
@@ -404,22 +413,22 @@ while corriendo:
     # Resto del bucle principal (actualización de estado, dibujo, etc.)
         
     for depredador in [animal for animal in lista_animales if isinstance(animal, Depredador)]:
+        depredador.actualizar_posiciones_presas([animal for animal in lista_animales if isinstance(animal, Presa)])
         depredador.mover(matriz)
-        
-    for presa in [animal for animal in lista_animales if isinstance(animal, Presa)]:
-        print(f"Presa en posición: {presa.posicion}")
-        presa.mover(matriz, tiempo_transcurrido)  # Pasar tiempo_transcurrido al método mover
 
-    # Aquí es donde manejarás la reproducción de las plantas
+    for presa in [animal for animal in lista_animales if isinstance(animal, Presa)]:
+        presa.actualizar_posicion()
+
+    
     for planta in lista_plantas:
-        planta.actualizar_tiempo_reproduccion(tiempo_transcurrido)
-        planta.reproducirse(lista_plantas, matriz)
+        planta.fotosintesis()  # Actualizar la vida de las plantas
+        planta.reproducirse()  # Intentar reproducirse
+        planta.dibujar_pl(pantalla)
+
+        
     for animal in lista_animales:
         animal.dibujar(pantalla)
     pygame.display.flip()  # Actualiza la pantalla completa
-
-    # Mantener el juego corriendo al FPS deseado
-    timer.tick(fps)
 
 pygame.quit()
 sys.exit()
