@@ -30,20 +30,22 @@ IMAGENES = {
 for key, image in IMAGENES.items():
     IMAGENES[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
 
-SPRITE_PLANTAS={
-    1: pygame.image.load('assets/map_images/planta.png'),
-    2: pygame.image.load('assets/map_images/arbusto.png'),      
-    12: pygame.image.load('assets/map_images/planta1.png'),     
+SPRITE_PLANTAS = {
+    pygame.image.load('assets/map_images/planta.png'),
+    pygame.image.load('assets/map_images/arbusto.png'),      
+    pygame.image.load('assets/map_images/planta1.png'),         
 }
 
-for key, image in SPRITE_PLANTAS.items():
-    SPRITE_PLANTAS[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
 
+SPRITE_PLANTAS_NOCHE={
+    1: pygame.image.load('assets/noche/planta.png'),    
+    2: pygame.image.load('assets/noche/arbusto.png'), 
+    12: pygame.image.load('assets/noche/planta1.png')
+}
 # Cargar y escalar imágenes
 IMAGENES_NOCHE = {
     0: pygame.image.load('assets/noche/pasto.png'),   # Pasto
-    1: pygame.image.load('assets/noche/planta.png'),    # Agujero
-    2: pygame.image.load('assets/noche/arbusto.png'),    # Arbusto
+
     3: pygame.image.load('assets/noche/AguaSupL.png'), 
     4: pygame.image.load('assets/noche/AguaSup.png'), 
     5: pygame.image.load('assets/noche/AguaSupR.png'), 
@@ -53,19 +55,22 @@ IMAGENES_NOCHE = {
     9: pygame.image.load('assets/noche/AguaAbajoL.png'), 
     10: pygame.image.load('assets/noche/AguaAbajo.png'), 
     11: pygame.image.load('assets/noche/AguaAbajoR.png'), 
-    12: pygame.image.load('assets/noche/planta1.png'), 
-    
 }
+
+
 
 for key, image in IMAGENES_NOCHE.items():
     IMAGENES_NOCHE[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
 
     
-SPRITES_ANIMALES = {
+SPRITES_ANIMALES_DEPREDADOR = {
     'depredador1': pygame.image.load('assets/depredador/depredador1.png'),
     'depredador2': pygame.image.load('assets/depredador/depredador2.png'),
     'depredador3': pygame.image.load('assets/depredador/depredador3.png'),
     'depredador4': pygame.image.load('assets/depredador/depredador4.png'),
+}
+
+SPRITES_ANIMALES_PRESA={
     # ... Añade el resto de los sprites de depredadores
     'normal1': pygame.image.load('assets/presas/normal1.png'),
     'normal2': pygame.image.load('assets/presas/normal2.png'),
@@ -76,8 +81,8 @@ SPRITES_ANIMALES = {
     # ... Añade el resto de los sprites normales
 }
 
-for key, image in SPRITES_ANIMALES.items():
-    SPRITES_ANIMALES[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
+for key, image in SPRITES_ANIMALES_DEPREDADOR.items():
+    SPRITES_ANIMALES_DEPREDADOR[key] = pygame.transform.scale(image, (TAMANO_CELDA, TAMANO_CELDA))
 
 
 
@@ -126,7 +131,7 @@ class Animal(Organismo):
         super().__init__(posicion, vida, energia, velocidad)
         self.especie = especie
         self.dieta = dieta
-        self.sprite = SPRITES_ANIMALES.get(especie, None)
+        self.sprite = SPRITES_ANIMALES_DEPREDADOR.get(especie, None)
         self.ultimo_movimiento = 0
 
     def cazar(self):
